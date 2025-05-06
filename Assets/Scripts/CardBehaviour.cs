@@ -12,18 +12,20 @@ public class CardBehaviour : MonoBehaviour
     //Stat stuff
     public float saltyMult, sweetMult, bitterMult, sourMult;
     public float addSalt, addSweet, addSour, addBitter;
-    public Vector3 desiredScale, ogSCale;
+    public Vector3 desiredScale, ogSCale,ogPos;
     //Main
     public bool draging, inHand,lerping,lerpScaleUp,lerpScaleDown;
     [SerializeField]float lerpTimer,scaleLerpTimer;
     Transform lerpTarget;
     public UnityEvent onUse;
     public CardCategory category;
+    BoxCollider2D coll2D;
     
     void Start()
     {
         Hand.instance.PutCardIn(this);
         ogSCale = transform.localScale;
+        coll2D = GetComponent<BoxCollider2D>();
     }
     void Update()
     {
@@ -34,6 +36,7 @@ public class CardBehaviour : MonoBehaviour
         }
         else if (lerping)
         {
+            ogPos = transform.localPosition;
             lerping = false;
             lerpTimer = 0;
         }
@@ -41,6 +44,7 @@ public class CardBehaviour : MonoBehaviour
         {
             scaleLerpTimer += Time.deltaTime;
             transform.localScale = Vector3.Lerp(transform.localScale, desiredScale, scaleLerpTimer);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(ogPos.x,ogPos.y +2,ogPos.z), scaleLerpTimer);
         }
         else if (lerpScaleUp)
         {
@@ -49,11 +53,14 @@ public class CardBehaviour : MonoBehaviour
         }
         else if (lerpScaleDown && !lerpScaleUp && transform.localScale.x > ogSCale.x)
         {
+            coll2D.enabled = false;
             scaleLerpTimer += Time.deltaTime;
             transform.localScale = Vector3.Lerp(transform.localScale, ogSCale, scaleLerpTimer);
+            transform.localPosition = Vector3.Lerp(transform.localPosition,ogPos, scaleLerpTimer);
         }
         else if (lerpScaleDown && !lerpScaleUp)
         {
+            coll2D.enabled = true;
             lerpScaleDown = false;
             scaleLerpTimer = 0;
         }
@@ -71,7 +78,6 @@ public class CardBehaviour : MonoBehaviour
     }
     private void OnMouseEnter()
     {
-        Debug.Log("Mouse Entered");
         lerpScaleUp = true;
         lerpScaleDown = false;
     }
