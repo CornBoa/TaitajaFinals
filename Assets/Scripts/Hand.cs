@@ -23,8 +23,7 @@ public class Hand : MonoBehaviour
             {
                 cardSlots[i].gameObject.SetActive(true);
                 cards.Add(card);
-                card.LerpTo(cardSlots[i].transform);
-                Debug.Log(cardSlots[i]);
+                card.LerpTo(cardSlots[i].transform);                
                 break;
             }
         }
