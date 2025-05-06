@@ -40,7 +40,6 @@ public class FadeInOut : MonoBehaviour
     }
     public void FadeIn()
     {
-        Debug.Log("Fading");
         Timer = 0;
         fadeIn = true;
     }

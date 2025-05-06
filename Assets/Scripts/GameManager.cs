@@ -9,11 +9,11 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public Dish currentDish;
     public List<CardBehaviour> allCards;
-    [SerializeField] GameObject RerollButton;
+    [SerializeField] GameObject RerollButton,secondRerollButton,thirdButton;
     [SerializeField] Transform boxSpawn,cupBOardSpawn;
     [SerializeField] UnityEvent onFirstTurnDealt,onSecondTurnDealt,onThirdTurnDealt;
     [SerializeField] Hand ing;
-    bool rerolling = false,rolledTooMuch = false;
+    bool rerolling = false,rolledTooMuch = false, rerolling2 = false, rolled2Much = false, rerolling3 = false, rolled3Much = false;
     private void Awake()
     {
         instance = this;
@@ -31,6 +31,10 @@ public class GameManager : MonoBehaviour
             if (ing.cards.Count > 0) foreach (var card in ing.cards)
             {
                card.gameObject.SetActive(false);
+            }
+            foreach (var card in ing.cards)
+            {
+                if (card == null)ing.cards.Remove(card);
             }
             ing.cards.Clear();
             int ingredients = 0;
@@ -75,20 +79,23 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator DealCardsSecondTurn()
     {
-        if (!rolledTooMuch)
+        if (!rolled2Much)
         {
             if (ing.cards.Count > 0) foreach (var card in ing.cards)
             {
-                 card.gameObject.SetActive(false);
+                 if(card.category == CardBehaviour.CardCategory.Equipment)card.gameObject.SetActive(false);
             }
-            ing.cards.Clear();
+            for (int i = 0; i < ing.transform.childCount; i++)
+            {
+                Debug.Log(ing.transform.GetChild(i).childCount);
+                if(ing.transform.GetChild(i).childCount < 1) ing.transform.GetChild(i).gameObject.SetActive(false);
+            }
             int equipment = 0;
             int cardAmount;
-            if (rerolling) cardAmount = 2;
-            else cardAmount = 3;
+            cardAmount = 1;
             for (int i = 0; i < allCards.Count; i++)
             {
-                if (allCards[i].category == CardBehaviour.CardCategory.Ingredient && equipment < cardAmount)
+                if (allCards[i].category == CardBehaviour.CardCategory.Equipment && equipment < cardAmount)
                 {
                     ing.PutCardIn(allCards[i]);
                     allCards[i].transform.position = boxSpawn.position;
@@ -97,13 +104,55 @@ public class GameManager : MonoBehaviour
                     yield return new WaitForSeconds(0.25f);
                 }
             }
-            if (!rerolling)
+            if (!rerolling2)
             {
 
-                rerolling = true;
+                rerolling2 = true;
             }
-            else RerollButton.SetActive(false);
-            onFirstTurnDealt.Invoke();
+            else secondRerollButton.SetActive(false);
+            onSecondTurnDealt.Invoke();
+        }
+    }
+    public void ThirdDealCards()
+    {
+        allCards = ShuffleList(allCards);
+        StartCoroutine(DealCardsThirdTurn());
+    }
+    IEnumerator DealCardsThirdTurn()
+    {
+        if (!rolled3Much)
+        {
+            if (ing.cards.Count > 0) foreach (var card in ing.cards)
+                {
+                    if (card.category == CardBehaviour.CardCategory.Technique) card.gameObject.SetActive(false);
+                }
+            for (int i = 0; i < ing.transform.childCount; i++)
+            {
+                Debug.Log(ing.transform.GetChild(i).childCount);
+                if (ing.transform.GetChild(i).childCount < 1) ing.transform.GetChild(i).gameObject.SetActive(false);
+            }
+            int tech = 0;
+            int cardAmount;
+            if(rerolling3) cardAmount = 1;
+            else cardAmount = 2;
+            for (int i = 0; i < allCards.Count; i++)
+            {
+                if (allCards[i].category == CardBehaviour.CardCategory.Technique && tech < cardAmount)
+                {
+                    ing.PutCardIn(allCards[i]);
+                    allCards[i].transform.position = boxSpawn.position;
+                    allCards[i].gameObject.SetActive(true);
+                    tech++;
+                    yield return new WaitForSeconds(0.25f);
+                }
+            }
+            if (!rerolling3)
+            {
+
+                rerolling3 = true;
+            }
+            else secondRerollButton.SetActive(false);
+            onSecondTurnDealt.Invoke();
         }
     }
     public void BasicCardUse(CardBehaviour card)

@@ -16,7 +16,7 @@ public class CardBehaviour : MonoBehaviour
     //Main
     public bool draging, inHand,lerping,lerpScaleUp,lerpScaleDown;
     [SerializeField]float lerpTimer,scaleLerpTimer,scaleSPeed,moveSpeed;
-    Transform lerpTarget;
+    public Transform lerpTarget;
     public UnityEvent onUse;
     public CardCategory category;
     BoxCollider2D coll2D;
@@ -109,6 +109,10 @@ public class CardBehaviour : MonoBehaviour
         transform.parent = slot;
         lerpTarget = slot;
         lerping = true;
+    }
+    private void OnDisable()
+    {
+        transform.parent = null;
     }
     public void ProperDisableCard()
     {
