@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,6 +18,10 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+    }
+    private void Start()
+    {
+        allCards = FindObjectsByType<CardBehaviour>(FindObjectsInactive.Include,FindObjectsSortMode.None).ToList();
     }
     [ContextMenu("ShuffleRQ")]
     public void FirstDealCards()
@@ -152,7 +157,7 @@ public class GameManager : MonoBehaviour
                 rerolling3 = true;
             }
             else secondRerollButton.SetActive(false);
-            onSecondTurnDealt.Invoke();
+            onThirdTurnDealt.Invoke();
         }
     }
     public void BasicCardUse(CardBehaviour card)
