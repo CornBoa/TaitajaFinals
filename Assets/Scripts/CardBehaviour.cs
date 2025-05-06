@@ -15,7 +15,7 @@ public class CardBehaviour : MonoBehaviour
     public Vector3 desiredScale, ogSCale,ogPos;
     //Main
     public bool draging, inHand,lerping,lerpScaleUp,lerpScaleDown;
-    [SerializeField]float lerpTimer,scaleLerpTimer;
+    [SerializeField]float lerpTimer,scaleLerpTimer,scaleSPeed,moveSpeed;
     Transform lerpTarget;
     public UnityEvent onUse;
     public CardCategory category;
@@ -23,7 +23,6 @@ public class CardBehaviour : MonoBehaviour
     
     void Start()
     {
-        Hand.instance.PutCardIn(this);
         ogSCale = transform.localScale;
         coll2D = GetComponent<BoxCollider2D>();
     }
@@ -32,7 +31,7 @@ public class CardBehaviour : MonoBehaviour
         if (lerping && Vector3.Distance(transform.position, lerpTarget.position) > 0.01)
         {
             lerpTimer += Time.deltaTime;
-            transform.position = Vector3.Lerp(transform.position,lerpTarget.position,lerpTimer);
+            transform.position = Vector3.Lerp(transform.position,lerpTarget.position,lerpTimer * moveSpeed);
         }
         else if (lerping)
         {
@@ -43,7 +42,7 @@ public class CardBehaviour : MonoBehaviour
         if (lerpScaleUp && !CompareScale())
         {
             scaleLerpTimer += Time.deltaTime;
-            transform.localScale = Vector3.Lerp(transform.localScale, desiredScale, scaleLerpTimer);
+            transform.localScale = Vector3.Lerp(transform.localScale, desiredScale, scaleLerpTimer * scaleSPeed);
             transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(ogPos.x,ogPos.y +2,ogPos.z), scaleLerpTimer);
         }
         else if (lerpScaleUp)
@@ -88,7 +87,7 @@ public class CardBehaviour : MonoBehaviour
     }
     private void OnMouseDown()
     {
-        if (transform.parent != null) Hand.instance.CardOut(transform.parent);
+        if (transform.parent != null) Hand.instance.CardOut(transform.parent,this);
         Vector3 newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GameObject.FindGameObjectWithTag("Anchor").transform.position = newPos;
         transform.parent = GameObject.FindGameObjectWithTag("Anchor").transform;
@@ -111,9 +110,8 @@ public class CardBehaviour : MonoBehaviour
         lerpTarget = slot;
         lerping = true;
     }
-    private void OnDestroy()
+    public void ProperDisableCard()
     {
-        Hand.instance.CardOut(transform.parent);
-        onUse.Invoke();
+        Hand.instance.CardOut(transform.parent, this);
     }
 }
