@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class CardBehaviour : MonoBehaviour
 {
@@ -11,12 +12,18 @@ public class CardBehaviour : MonoBehaviour
     //Stat stuff
     public float saltyMult, sweetMult, bitterMult, sourMult;
     public float addSalt, addSweet, addSour, addBitter;
-    public bool draging, inHand,lerping;
-    [SerializeField]float lerpTimer;
+    public Vector3 desiredScale, ogSCale;
+    //Main
+    public bool draging, inHand,lerping,lerpScaleUp,lerpScaleDown;
+    [SerializeField]float lerpTimer,scaleLerpTimer;
     Transform lerpTarget;
+    public UnityEvent onUse;
+    public CardCategory category;
+    
     void Start()
     {
         Hand.instance.PutCardIn(this);
+        ogSCale = transform.localScale;
     }
     void Update()
     {
@@ -30,6 +37,48 @@ public class CardBehaviour : MonoBehaviour
             lerping = false;
             lerpTimer = 0;
         }
+        if (lerpScaleUp && !CompareScale())
+        {
+            scaleLerpTimer += Time.deltaTime;
+            transform.localScale = Vector3.Lerp(transform.localScale, desiredScale, scaleLerpTimer);
+        }
+        else if (lerpScaleUp)
+        {
+            lerpScaleUp = false;
+            scaleLerpTimer= 0;
+        }
+        else if (lerpScaleDown && !lerpScaleUp && transform.localScale.x > ogSCale.x)
+        {
+            scaleLerpTimer += Time.deltaTime;
+            transform.localScale = Vector3.Lerp(transform.localScale, ogSCale, scaleLerpTimer);
+        }
+        else if (lerpScaleDown && !lerpScaleUp)
+        {
+            lerpScaleDown = false;
+            scaleLerpTimer = 0;
+        }
+    }
+    bool CompareScale()
+    {
+        if (transform.localScale.x < desiredScale.x && transform.localScale.z < desiredScale.z && transform.localScale.z < desiredScale.z)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    private void OnMouseEnter()
+    {
+        Debug.Log("Mouse Entered");
+        lerpScaleUp = true;
+        lerpScaleDown = false;
+    }
+    private void OnMouseExit()
+    {
+        lerpScaleUp = false;
+        lerpScaleDown = true;
     }
     private void OnMouseDown()
     {
@@ -55,5 +104,10 @@ public class CardBehaviour : MonoBehaviour
         transform.parent = slot;
         lerpTarget = slot;
         lerping = true;
+    }
+    private void OnDestroy()
+    {
+        Hand.instance.CardOut(transform.parent);
+        onUse.Invoke();
     }
 }
