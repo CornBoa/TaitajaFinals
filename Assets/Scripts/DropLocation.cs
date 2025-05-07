@@ -15,7 +15,6 @@ public class DropLocation : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Card entered");
         if (other.GetComponent<CardBehaviour>() != null)
         {
             card = other.GetComponent<CardBehaviour>();
@@ -30,7 +29,7 @@ public class DropLocation : MonoBehaviour
     }
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (card != null&& !card.draging)
+        if (card != null&& !card.draging && !card.inHand)
         {
             CheckCards();
         }
@@ -38,7 +37,9 @@ public class DropLocation : MonoBehaviour
 
     public void CheckCards()
     {
-            Destroy(card.gameObject);
-            Debug.Log("Did stuff");
+        GameManager.instance.BasicCardUse(card);
+        Hand.instance.CardOut(card.lerpTarget,card);
+        if(card != null)card.gameObject.SetActive(false);  
+        
     }
 }

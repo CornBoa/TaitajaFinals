@@ -26,4 +26,26 @@ public class PlayerScriptStuff : MonoBehaviour
     {
         four.Invoke();
     }
+    public void GoAnim(int i)
+    {
+        switch (i)
+        {
+            case 1:
+                animator.SetTrigger("GoOne");
+                break;
+            case 2:
+                animator.SetTrigger("GoTwo");
+                break;
+            case 3:
+                animator.SetTrigger("GoThree");
+                break;
+            case 4:
+                animator.SetTrigger("GoFour");
+                break;
+            case 5:
+                animator.SetTrigger("GoFive");
+                break;
+
+        }
+    }
 }

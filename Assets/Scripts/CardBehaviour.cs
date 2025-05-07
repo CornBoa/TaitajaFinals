@@ -37,6 +37,7 @@ public class CardBehaviour : MonoBehaviour
         {
             ogPos = transform.localPosition;
             lerping = false;
+            inHand = true;
             lerpTimer = 0;
         }
         if (lerpScaleUp && !CompareScale())
@@ -92,6 +93,7 @@ public class CardBehaviour : MonoBehaviour
         GameObject.FindGameObjectWithTag("Anchor").transform.position = newPos;
         transform.parent = GameObject.FindGameObjectWithTag("Anchor").transform;
         draging = true;
+        inHand = false;
     }
     private void OnMouseDrag()
     {
@@ -112,7 +114,8 @@ public class CardBehaviour : MonoBehaviour
     }
     private void OnDisable()
     {
-        transform.parent = null;
+        if(transform.parent.gameObject.activeSelf)transform.parent = null;
+        ProperDisableCard();
     }
     public void ProperDisableCard()
     {

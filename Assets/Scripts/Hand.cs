@@ -30,7 +30,6 @@ public class Hand : MonoBehaviour
     }
     public void CardOut(Transform slot,CardBehaviour card)
     {
-        card.transform.parent = null;
         slot.gameObject.SetActive(false);
         cards.Remove(card);
     }
