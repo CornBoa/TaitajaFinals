@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,11 +14,13 @@ public class GameManager : MonoBehaviour
     public List<CardBehaviour> allCards;
     [SerializeField] GameObject RerollButton,secondRerollButton,thirdButton;
     [SerializeField] Transform boxSpawn,cupBOardSpawn;
-    [SerializeField] UnityEvent onFirstTurnDealt,onSecondTurnDealt,onThirdTurnDealt;
+    [SerializeField] UnityEvent onFirstTurnDealt, onSecondTurnDealt, onThirdTurnDealt, onDeath;
     [SerializeField] Hand ing;
     bool rerolling = false,rolledTooMuch = false, rerolling2 = false, rolled2Much = false, rerolling3 = false, rolled3Much = false;
     [SerializeField]CustomerStuff customer;
     [SerializeField] List<GameObject> lives;
+    [SerializeField] TextMeshProUGUI textFeedback,dishStats;
+    int livesCount = 3;
     private void Awake()
     {
         instance = this;
@@ -31,19 +35,24 @@ public class GameManager : MonoBehaviour
         allCards = ShuffleList(allCards);
         StartCoroutine(DealCardsFirstTurn());
     }
+    public void ProperReset()
+    {
+        rerolling = false;
+        rerolling2 = false;
+        rerolling3 = false;
+        rolledTooMuch = false;
+        rolled2Much = false;
+        rolled3Much = false;
+    }
     IEnumerator DealCardsFirstTurn()
     {
         if (!rolledTooMuch)
         {
-            if (ing.cards.Count > 0) foreach (var card in ing.cards)
+            if (rerolling)
             {
-               card.gameObject.SetActive(false);
-            }
-            foreach (var card in ing.cards)
-            {
-                if (card == null)ing.cards.Remove(card);
-            }
-            ing.cards.Clear();
+                ing.Discardhand(CardBehaviour.CardCategory.Ingredient, true);
+                ing.Discardhand(CardBehaviour.CardCategory.Flavor, true);
+            }      
             int ingredients = 0;
             int flavor = 0;
             int cardAmount;
@@ -165,11 +174,40 @@ public class GameManager : MonoBehaviour
         currentDish.Taste();
         if (currentDish.TastePref == customer.tastepreferance)
         {
-            //Good stuff;
+            switch (customer.tastepreferance)
+            {
+                case CustomerStuff.TastePref.Salty:
+                    if (Mathf.Abs(currentDish.salty - customer.salty) > 5) textFeedback.text = "Yeah it is correct taste, but not the way I like it.(1 out of 3)";
+                    else if (Mathf.Abs(currentDish.salty - customer.salty) < 5) textFeedback.text = "Almost exactly as I wanted!(2 out of 3)";
+                    else textFeedback.text = "OH MY GOD, EXACTLY AS I WANTED THANK YOU!!!(3 out of 3)";
+                        break;
+                case CustomerStuff.TastePref.Sweet:
+                    if (Mathf.Abs(currentDish.sweety - customer.sweet) > 5) textFeedback.text = "Yeah it is correct taste, but not the way I like it.(1 out of 3)";
+                    else if (Mathf.Abs(currentDish.sweety- customer.sweet) < 5) textFeedback.text = "Almost exactly as I wanted!(2 out of 3)";
+                    else textFeedback.text = "OH MY GOD, EXACTLY AS I WANTED THANK YOU!!!(3 out of 3)";
+                    break;
+                case CustomerStuff.TastePref.Sour:
+                    if (Mathf.Abs(currentDish.soury - customer.soury) > 5) textFeedback.text = "Yeah it is correct taste, but not the way I like it.(1 out of 3)";
+                    else if (Mathf.Abs(currentDish.soury - customer.soury) < 5) textFeedback.text = "Almost exactly as I wanted!(2 out of 3)";
+                    else textFeedback.text = "OH MY GOD, EXACTLY AS I WANTED THANK YOU!!!(3 out of 3)";
+                    break;
+                case CustomerStuff.TastePref.Bitter:
+                    if (Mathf.Abs(currentDish.bittery- customer.bitter) > 5) textFeedback.text = "Yeah it is correct taste, but not the way I like it.(1 out of 3)";
+                    else if (Mathf.Abs(currentDish.bittery - customer.bitter) < 5) textFeedback.text = "Almost exactly as I wanted!(2 out of 3)";
+                    else textFeedback.text = "OH MY GOD, EXACTLY AS I WANTED THANK YOU!!!(3 out of 3)";
+                    break;
+            }
         }
         else
         {
-            lives[lives.Count-1].SetActive(false);
+            
+            lives[livesCount-1].SetActive(false);
+            livesCount--;
+            if (livesCount == 0)
+            {
+                onDeath.Invoke();
+            }
+            textFeedback.text = "Bleugh, what the hell is this? And you call yourself a chef?(0 out of 3)";
         }
     }
     public void BasicCardUse(CardBehaviour card)
@@ -190,6 +228,14 @@ public class GameManager : MonoBehaviour
             list[j] = temp;
         }
         return list;
+    }
+    public void Update()
+    {
+        if(currentDish.salty > 20)currentDish.salty = 20;
+        if(currentDish.sweety > 20)currentDish.sweety = 20;
+        if(currentDish.soury > 20) currentDish.soury = 20;
+        if(currentDish.bittery > 20)currentDish.bittery = 20;
+        dishStats.text = "Saltyness:" + currentDish.salty +"\nSweetness:" + currentDish.sweety +"\nBitterness:" + currentDish.bittery + "\nSourness:" + currentDish.soury;
     }
 }
 [Serializable]

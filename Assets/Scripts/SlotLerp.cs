@@ -11,6 +11,8 @@ public class SlotLerp : MonoBehaviour
     }
     void Update()
     {
+        if (transform.childCount == 0) gameObject.SetActive(false);
+        else if (!transform.GetChild(0).gameObject.activeSelf) transform.GetChild(0).transform.parent = null;
         if (lerping && Vector3.Distance(transform.position, lerpTarget) > 0.01)
         {
             timer += Time.deltaTime;

@@ -17,6 +17,7 @@ public class Hand : MonoBehaviour
     }
     public void PutCardIn(CardBehaviour card)
     {
+        Debug.Log(card);
         for (int i = 0; i < cardSlots.Count; i++)
         {
             if (!cardSlots[i].gameObject.activeSelf)
@@ -30,8 +31,25 @@ public class Hand : MonoBehaviour
     }
     public void CardOut(Transform slot,CardBehaviour card)
     {
-        slot.gameObject.SetActive(false);
-        cards.Remove(card);
+        //cards.Remove(card); 
+    }
+    public void Discardhand(CardBehaviour.CardCategory cat,bool sort)
+    {
+        if (sort)
+        {
+            foreach (CardBehaviour card in cards)
+            {
+                if(card.category == cat)card.ProperDisableCard();
+            }
+        }
+        else
+        {
+            foreach (CardBehaviour card in cards)
+            {
+                card.ProperDisableCard();
+            }
+        }
+        
     }
     void Update()
     {

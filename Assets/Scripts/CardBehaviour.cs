@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,18 +14,31 @@ public class CardBehaviour : MonoBehaviour
     public float saltyMult, sweetMult, bitterMult, sourMult;
     public float addSalt, addSweet, addSour, addBitter;
     public Vector3 desiredScale, ogSCale,ogPos;
+    public TextMeshProUGUI descriptionStats;
     //Main
     public bool draging, inHand,lerping,lerpScaleUp,lerpScaleDown;
     [SerializeField]float lerpTimer,scaleLerpTimer,scaleSPeed,moveSpeed;
     public Transform lerpTarget;
-    public UnityEvent onUse;
+    public UnityEvent onUse, onGrab, onGrab2;
     public CardCategory category;
     BoxCollider2D coll2D;
     
     void Start()
     {
+        
         ogSCale = transform.localScale;
         coll2D = GetComponent<BoxCollider2D>();
+        descriptionStats = GetComponentsInChildren<TextMeshProUGUI>()[1];
+        descriptionStats.text = "";
+        descriptionStats.paragraphSpacing = -30f;
+        if (saltyMult > 1 || saltyMult < 1) descriptionStats.text += "Saltyness:" + saltyMult + "\n"; 
+        if(sweetMult > 1 || sweetMult < 1)descriptionStats.text += "Sweetness:" + sweetMult + "\n";
+        if (bitterMult > 1 || bitterMult < 1) descriptionStats.text += "Bitterness:" + bitterMult + "\n";
+        if (sourMult > 1 || sourMult < 1) descriptionStats.text += "Sourness:" + sourMult + "\n";
+        if (addSalt > 0 || addSalt < 0) descriptionStats.text += "Saltyness:" + addSalt + "\n";
+        if (addSweet > 0 || addSweet < 0) descriptionStats.text += "Sweetness:" + addSweet + "\n";
+        if (addSour > 0 || addSour < 0) descriptionStats.text += "Bitterness:" + addBitter + "\n";
+        if (addBitter > 0 || addBitter < 0) descriptionStats.text += "Sourness:" + addSour + "\n";
     }
     void Update()
     {
@@ -94,6 +108,7 @@ public class CardBehaviour : MonoBehaviour
         transform.parent = GameObject.FindGameObjectWithTag("Anchor").transform;
         draging = true;
         inHand = false;
+        onGrab.Invoke();
     }
     private void OnMouseDrag()
     {
@@ -105,20 +120,23 @@ public class CardBehaviour : MonoBehaviour
         draging = false;
         transform.parent = null;
         Hand.instance.PutCardIn(this);
+        onGrab.Invoke();
     }
     public void LerpTo(Transform slot)
     {
+        onGrab2.Invoke();
         transform.parent = slot;
         lerpTarget = slot;
         lerping = true;
     }
     private void OnDisable()
-    {
-        if(transform.parent.gameObject.activeSelf)transform.parent = null;
+    {       
         ProperDisableCard();
     }
     public void ProperDisableCard()
     {
         Hand.instance.CardOut(transform.parent, this);
+        //if(transform.parent.gameObject.activeSelf)transform.SetParent(transform);
+        if(gameObject.activeSelf)gameObject.SetActive(false);      
     }
 }

@@ -5,11 +5,15 @@ public class MainMenuButtons : MonoBehaviour
 {
     private void Start()
     {
-        FindFirstObjectByType<FadeInOut>().FadeIn();
+        if(SceneManager.GetActiveScene().buildIndex == 0)FindFirstObjectByType<FadeInOut>().FadeIn();
     }
     public void Play()
     {
         SceneManager.LoadScene(1);
+    }
+    public void Lost()
+    {
+        SceneManager.LoadScene(2);
     }
     public void Quit()
     {

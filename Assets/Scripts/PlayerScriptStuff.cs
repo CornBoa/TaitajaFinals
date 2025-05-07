@@ -4,7 +4,7 @@ using UnityEngine.Events;
 public class PlayerScriptStuff : MonoBehaviour
 {
     Animator animator;
-    public UnityEvent one,two,three,four;
+    public UnityEvent one,two,three,four,five;
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -25,6 +25,10 @@ public class PlayerScriptStuff : MonoBehaviour
     public void StartTurnFour()
     {
         four.Invoke();
+    }
+    public void Evaluation()
+    {
+        five.Invoke();
     }
     public void GoAnim(int i)
     {

@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DropLocation : MonoBehaviour
 {
     public static DropLocation Instance;
     [SerializeField]LayerMask layerMask;
     CardBehaviour card;
+    public UnityEvent Sound;
     private void Awake()
     {
         Instance = this;
@@ -37,9 +39,8 @@ public class DropLocation : MonoBehaviour
 
     public void CheckCards()
     {
+        Sound.Invoke();
         GameManager.instance.BasicCardUse(card);
-        Hand.instance.CardOut(card.lerpTarget,card);
-        if(card != null)card.gameObject.SetActive(false);  
-        
+        if(card != null)card.gameObject.SetActive(false);         
     }
 }

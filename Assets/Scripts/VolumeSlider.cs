@@ -12,6 +12,10 @@ public class VolumeSlider : MonoBehaviour
     [SerializeField] SliderKind kind;
     float value;
     [SerializeField]bool dodat = false;
+    private void Start()
+    {
+        Setup();
+    }
     public void Setup()
     {
         slider = GetComponent<Slider>();
