@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] UnityEvent onFirstTurnDealt,onSecondTurnDealt,onThirdTurnDealt;
     [SerializeField] Hand ing;
     bool rerolling = false,rolledTooMuch = false, rerolling2 = false, rolled2Much = false, rerolling3 = false, rolled3Much = false;
+    [SerializeField]CustomerStuff customer;
+    [SerializeField] List<GameObject> lives;
     private void Awake()
     {
         instance = this;
@@ -92,7 +94,6 @@ public class GameManager : MonoBehaviour
             }
             for (int i = 0; i < ing.transform.childCount; i++)
             {
-                Debug.Log(ing.transform.GetChild(i).childCount);
                 if(ing.transform.GetChild(i).childCount < 1) ing.transform.GetChild(i).gameObject.SetActive(false);
             }
             int equipment = 0;
@@ -133,7 +134,6 @@ public class GameManager : MonoBehaviour
                 }
             for (int i = 0; i < ing.transform.childCount; i++)
             {
-                Debug.Log(ing.transform.GetChild(i).childCount);
                 if (ing.transform.GetChild(i).childCount < 1) ing.transform.GetChild(i).gameObject.SetActive(false);
             }
             int tech = 0;
@@ -162,7 +162,15 @@ public class GameManager : MonoBehaviour
     }
     public void OrderFit()
     {
-
+        currentDish.Taste();
+        if (currentDish.TastePref == customer.tastepreferance)
+        {
+            //Good stuff;
+        }
+        else
+        {
+            lives[lives.Count-1].SetActive(false);
+        }
     }
     public void BasicCardUse(CardBehaviour card)
     {
@@ -188,7 +196,7 @@ public class GameManager : MonoBehaviour
 public class Dish 
 {
     public float salty, sweety, bittery, soury, tolerance;
-    CustomerStuff.TastePref TastePref;
+    public CustomerStuff.TastePref TastePref;
     public void AddUp(CardBehaviour card)
     {
         salty += card.addSalt;
