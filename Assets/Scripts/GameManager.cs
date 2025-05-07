@@ -160,6 +160,10 @@ public class GameManager : MonoBehaviour
             onThirdTurnDealt.Invoke();
         }
     }
+    public void OrderFit()
+    {
+
+    }
     public void BasicCardUse(CardBehaviour card)
     {
         if (currentDish != null)
@@ -183,7 +187,8 @@ public class GameManager : MonoBehaviour
 [Serializable]
 public class Dish 
 {
-    public float salty, sweety, bittery, soury;
+    public float salty, sweety, bittery, soury, tolerance;
+    CustomerStuff.TastePref TastePref;
     public void AddUp(CardBehaviour card)
     {
         salty += card.addSalt;
@@ -194,5 +199,17 @@ public class Dish
         sweety *= card.sweetMult;
         bittery *= card.bitterMult;
         soury *= card.sourMult;
+    }
+    public CustomerStuff.TastePref Taste()
+    {
+        List<float> list = new List<float> {salty,sweety,bittery,soury };
+        float min = list.Min();
+        float max = list.Max();
+        if (max - min < tolerance) TastePref = CustomerStuff.TastePref.PourBalance;
+        else if (salty > 10) TastePref = CustomerStuff.TastePref.Salty;
+        else if (sweety > 10) TastePref = CustomerStuff.TastePref.Sweet;
+        else if (bittery > 10) TastePref = CustomerStuff.TastePref.Bitter;
+        else if (soury > 10) TastePref = CustomerStuff.TastePref.Sour;
+        return TastePref;
     }
 }
